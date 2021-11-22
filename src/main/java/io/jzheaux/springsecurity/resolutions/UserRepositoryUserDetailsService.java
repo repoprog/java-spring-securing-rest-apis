@@ -20,6 +20,12 @@ public class UserRepositoryUserDetailsService implements UserDetailsService {
         this.users = users;
     }
 
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		return this.users.findByUsername(username)
+				.map(this::map)
+				.orElseThrow(() -> new UsernameNotFoundException("no user"));
+	}
     private BridgedUser map(User user) {
         Collection<GrantedAuthority> authorities = new HashSet<>();
         for (UserAuthority userAuthority : user.getUserAuthorities()) {
@@ -33,12 +39,6 @@ public class UserRepositoryUserDetailsService implements UserDetailsService {
         return new BridgedUser(user, authorities);
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return this.users.findByUsername(username)
-                .map(this::map)
-                .orElseThrow(() -> new UsernameNotFoundException("no user"));
-    }
 
     private static class BridgedUser extends User implements UserDetails {
         private final Collection<GrantedAuthority> authorities;

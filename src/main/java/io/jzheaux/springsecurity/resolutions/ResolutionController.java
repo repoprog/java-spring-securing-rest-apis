@@ -24,40 +24,40 @@ public class ResolutionController {
 		this.resolutions = resolutions;
 	}
 
-	@GetMapping("/resolutions")
 	@PreAuthorize("hasAuthority('resolution:read')")
 	@PostFilter("@post.filter(#root)")
-	@PostAuthorize("@post.authorize(#root)")
+	@GetMapping("/resolutions")
 	public Iterable<Resolution> read() {
 		return this.resolutions.findAll();
 	}
 
-	@GetMapping("/resolution/{id}")
 	@PreAuthorize("hasAuthority('resolution:read')")
 	@PostAuthorize("@post.authorize(#root)")
+	@GetMapping("/resolution/{id}")
 	public Optional<Resolution> read(@PathVariable("id") UUID id) {
 		return this.resolutions.findById(id);
 	}
 
-	@PostMapping("/resolution")
 	@PreAuthorize("hasAuthority('resolution:write')")
-	@PostAuthorize("@post.authorize(#root)")
+	@PostMapping("/resolution")
 	public Resolution make(@CurrentUsername String owner,@RequestBody String text) {
 		Resolution resolution = new Resolution(text, owner);
 		return this.resolutions.save(resolution);
 	}
 
-	@PutMapping(path="/resolution/{id}/revise")
 	@PreAuthorize("hasAuthority('resolution:write')")
 	@PostAuthorize("@post.authorize(#root)")
+	@PutMapping(path="/resolution/{id}/revise")
+	@Transactional
 	public Optional<Resolution> revise(@PathVariable("id") UUID id, @RequestBody String text) {
 		this.resolutions.revise(id, text);
 		return read(id);
 	}
 
-	@PutMapping("/resolution/{id}/complete")
 	@PreAuthorize("hasAuthority('resolution:write')")
 	@PostAuthorize("@post.authorize(#root)")
+	@PutMapping("/resolution/{id}/complete")
+	@Transactional
 	public Optional<Resolution> complete(@PathVariable("id") UUID id) {
 		this.resolutions.complete(id);
 		return read(id);
