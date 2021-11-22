@@ -19,6 +19,12 @@ public class UserRepositoryUserDetailsService implements UserDetailsService {
         this.users = users;
     }
 
+    @Override
+    public UserDetails loadUserByUsername(String username) {
+        return this.users.findByUsername(username)
+                .map(io.jzheaux.springsecurity.resolutions.UserRepositoryUserDetailsService.BridgedUser::new)
+                .orElseThrow(() -> new UsernameNotFoundException("invalid user"));
+    }
     private static class BridgedUser extends User implements UserDetails {
         public BridgedUser(User user) {
             super(user);
@@ -44,10 +50,4 @@ public class UserRepositoryUserDetailsService implements UserDetailsService {
         }
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) {
-        return this.users.findByUsername(username)
-                .map(BridgedUser::new)
-                .orElseThrow(() -> new UsernameNotFoundException("invalid user"));
-    }
 }

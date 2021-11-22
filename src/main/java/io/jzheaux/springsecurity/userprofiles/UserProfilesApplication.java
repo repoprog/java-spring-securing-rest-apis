@@ -14,15 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Optional;
 
 @SpringBootApplication
-public class UserProfilesApplication implements UserDetailsService {
+public class UserProfilesApplication  {
     @Bean
     public TomcatConnectorCustomizer connectorCustomizer() {
         return container -> container.setPort(8081);
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) {
-        throw new UsernameNotFoundException("no user");
     }
 
     @RestController
